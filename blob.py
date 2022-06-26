@@ -14,10 +14,28 @@ class Blob:
         # Load image of blob charatcer
         # self.image = pygame.image.load("images\\blob.bmp")
         # self.rect = self.image.get_rect()
+        
         self.rect = pygame.Rect(0, 0, self.settings.block_size, self.settings.block_size)
-
         # Start each new blob at position 
-        self.rect.topleft = (0,0)
+        self.rect.topleft = (self.settings.block_size,self.settings.block_size)
+
+        # Movment flags
+        self.move_right = False
+        self.move_left  = False
+        self.move_up    = False
+        self.move_down  = False
+
+    def move_blob(self):
+        if self.move_right and (self.rect.right < self.settings.screen_width):
+            self.rect.x += self.settings.block_size
+        if self.move_left and (self.rect.left > 0):
+            self.rect.x -= self.settings.block_size
+        if self.move_up and (self.rect.top > 0):
+            self.rect.y -= self.settings.block_size
+        if self.move_down and (self.rect.bottom < self.settings.screen_height):
+            self.rect.y += self.settings.block_size
+
+        
 
     def draw_blob(self):
         """Function to draw the blob character on screen"""
