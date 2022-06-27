@@ -2,6 +2,7 @@ import pygame
 import sys
 from settings import Settings
 from blob import Blob
+from map import Map
 
 class The_Blob:
 
@@ -14,6 +15,7 @@ class The_Blob:
             self.settings.screen_height))
         pygame.display.set_caption("The Blob")
         self.blob = Blob(self)
+        self.map = Map(self)
 
 
     def run_game(self):
@@ -59,7 +61,10 @@ class The_Blob:
         pygame.display.update() # update() is same as flip without any arguments
         self.screen.fill(self.settings.bg_color)
         self.draw_grid()
+        self.map.draw_map()
         self.blob.draw_blob()
+        # self.map.add_tile(5,5,1)
+        # self.map.add_tile(8,8,2)
 
 
     def draw_grid(self):
