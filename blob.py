@@ -16,8 +16,12 @@ class Blob:
         # self.rect = self.image.get_rect()
         
         self.rect = pygame.Rect(0, 0, self.settings.block_size, self.settings.block_size)
-        # Start each new blob at position 
-        self.rect.topleft = (self.settings.block_size,self.settings.block_size)
+
+        # Start each new blob at position spawn tile from settings.
+        for y in range(self.settings.screen_height // self.settings.block_size):
+            for x in range(self.settings.screen_height // self.settings.block_size):
+                if self.settings.map[y,x] == 1:
+                    self.rect.topleft = (x*self.settings.block_size, y*self.settings.block_size)
 
         # Movment flags
         self.move_right = False
