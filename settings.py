@@ -8,6 +8,8 @@ class Settings:
     
         # Screen settings
         self.screen_width = 800
+        self.screen_score_width = 300
+        self.total_width =  self.screen_width + self.screen_score_width
         self.screen_height = 800
         self.bg_color = (0,0,0)
 
@@ -39,5 +41,5 @@ class Settings:
                              [0,0,0,0,0,0,0,3,0,0,0,0,0,3,2,0],
                              [0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,0],
                              [0,0,0,0,0,0,0,3,3,3,3,3,3,3,0,0],
-                             [999,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]])
+                             [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]])
         

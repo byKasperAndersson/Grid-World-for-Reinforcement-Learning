@@ -1,9 +1,9 @@
 import pygame 
 import sys
-import numpy
 from settings import Settings
 from blob import Blob
 from map import Map
+from q_learning import Q_learning
 
 class The_Blob:
 
@@ -12,23 +12,24 @@ class The_Blob:
         pygame.init()
 
         self.settings = Settings()
-        self.screen = pygame.display.set_mode((self.settings.screen_width,
+        self.screen = pygame.display.set_mode((self.settings.total_width,
             self.settings.screen_height))
         pygame.display.set_caption("The Blob")
         self.blob = Blob(self)
         self.map = Map(self)
         self.spawn_tile = self.map.create_map_rects(return_spawn_tile=True)
-        self.points = 0
-
-
-
+        self.score = 0
+        self.font_score = pygame.font.SysFont(None, 25)
+        self.QL = Q_learning(self)
+        
     def run_game(self):
         """"Main loop of the game."""
         while True:
             self.check_events()
-            self.update_screen()
-            self.blob.move_blob()
-            self.detect_collision()
+            #self.update_screen()
+            #self.blob.move_blob()
+            self.QL.q_learning(epsilon=0.5, alpha=0.1, gamma = 0.95, episodes = 100)
+            #self.detect_collision()
 
 
             # For every second, at most "self.fps" frames may pass.
@@ -44,8 +45,17 @@ class The_Blob:
                 sys.exit()
                 
             elif event.type == pygame.KEYDOWN:
-                print([self.blob.rect.x,self.blob.rect.y])
-                print([self.settings.map[self.blob.rect.y // self.settings.block_size, self.blob.rect.x // self.settings.block_size]])
+
+                #print([self.blob.rect.x // self.settings.block_size, 
+                    #self.blob.rect.y // self.settings.block_size])
+                # print([self.settings.map[self.blob.rect.y // self.settings.block_size, self.blob.rect.x // self.settings.block_size]])
+
+                # To prevent diagonal movement
+                self.blob.move_right = False
+                self.blob.move_left = False
+                self.blob.move_up = False
+                self.blob.move_down = False
+
                 if event.key == pygame.K_RIGHT:
                     self.blob.move_right = True
                 if event.key == pygame.K_LEFT:
@@ -70,13 +80,18 @@ class The_Blob:
 
     def update_screen(self):
         """Update images on screen and flip to new screen."""
-        pygame.display.update() # update() is same as flip without as long no arguments are passed
+        pygame.display.update() # update() is same as flip() as long no arguments are passed
         self.screen.fill(self.settings.bg_color)
         self.draw_grid()
+        self.display_score()
         self.map.draw_map()
         self.blob.draw_blob()
-        # self.map.add_tile(5,5,1)
-        # self.map.add_tile(8,8,2)
+
+
+    def display_score(self):
+        """Display score text and score in top right corner"""
+        self.text_score = self.font_score.render("Score: " + str(self.score), True, (255,255,255))
+        self.screen.blit(self.text_score, self.text_score.get_rect(center = (950,150)))
 
 
     def draw_grid(self):
@@ -96,11 +111,11 @@ class The_Blob:
         for tile in self.map.tiles:
             if [self.blob.rect.x // block_size, self.blob.rect.y // block_size] == [tile[1].x, tile[1].y]:
                 
-                # Green (goal) collision, send back to spawn and reward positive points.
+                # Green (goal) collision, send back to spawn, positive points.
                 if tile[0] == 2:
                     self.goal_collision()
 
-                # Red (lava) collision, send back to spawn.
+                # Red (lava) collision, send back to spawn, negative points.
                 if tile[0] == 3:
                     self.lava_collision()
 
@@ -108,16 +123,22 @@ class The_Blob:
                 if tile[0] == 4:
                     self.water_collision()
 
-    def lava_collision(self):
-        self.blob.rect.topleft = [self.settings.block_size*i for i in self.spawn_tile]
-
-    def water_collision(self):
-        #Implement when QL is done.
-        print("Water Collision")
 
     def goal_collision(self):
         #Implement when QL is done.
-        print("Goal Collision")    
+        self.blob.rect.topleft = [self.settings.block_size*i for i in self.spawn_tile]
+        self.score += 10
+        print("Goal Collision")  
+
+
+    def lava_collision(self):
+        self.blob.rect.topleft = [self.settings.block_size*i for i in self.spawn_tile]
+        self.score += -10
+
+    def water_collision(self):
+        #Implement when QL is done.
+        self.score += -2
+        print("Water Collision")  
 
 
 
