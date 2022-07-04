@@ -31,22 +31,25 @@ class Blob:
         self.move_up    = False
         self.move_down  = False
 
-    def move_blob(self):
+    def move_blob(self, manual, algorithm_movement = None):
+        """Moves the blob according to either keyboard arrows (manual = True) or 
+            some descion from an algorithm (manual = False), e.g., Q-Learning.
+            If manual = False, then algorithm_movement should the new position
+            of the blob (= [x_new,y_new])."""
 
-        if self.move_right and (self.rect.right < self.settings.screen_width):
-            self.rect.x += self.settings.block_size
-        if self.move_left and (self.rect.left > 0):
-            self.rect.x -= self.settings.block_size
-        if self.move_up and (self.rect.top > 0):
-            self.rect.y -= self.settings.block_size
-        if self.move_down and (self.rect.bottom < self.settings.screen_height):
-            self.rect.y += self.settings.block_size
+        if manual:
+            if self.move_right and (self.rect.right < self.settings.screen_width):
+                self.rect.x += self.settings.block_size
+            if self.move_left and (self.rect.left > 0):
+                self.rect.x -= self.settings.block_size
+            if self.move_up and (self.rect.top > 0):
+                self.rect.y -= self.settings.block_size
+            if self.move_down and (self.rect.bottom < self.settings.screen_height):
+                self.rect.y += self.settings.block_size
+        else:
+            self.rect.x = algorithm_movement[0]*self.settings.block_size
+            self.rect.y = algorithm_movement[1]*self.settings.block_size
 
-        #       # Movment flags
-        # self.move_right = False
-        # self.move_left  = False
-        # self.move_up    = False
-        # self.move_down  = False
 
         
 
