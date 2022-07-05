@@ -23,7 +23,7 @@ class Settings:
         self.fps = 30
 
         # Tile rewards. Format: [Standard, Spawn, Goal, Lava, Water]
-        self.rewards = [0,0,10,-10,-2]
+        self.rewards = [0,0,1,-1,-1]
 
         # Playable map. Should be 16x16 (0 - 15)x(0 - 15)
         # 0 = Standard (no) tile. This has no affect. 

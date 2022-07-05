@@ -20,9 +20,10 @@ class The_Blob:
         self.spawn_tile = self.map.create_map_rects(return_spawn_tile=True)
         self.score = 0
         self.font_score = pygame.font.SysFont(None, 25)
+        self.font_q_table = pygame.font.SysFont(None,15)
 
         # Episodes
-        self.episodes = 1000 # Change to how many rounds you want to play the game.
+        self.episodes = 10000 # Change to how many rounds you want to play the game.
         self.current_episode = 1 # Don't change
 
 
@@ -37,7 +38,7 @@ class The_Blob:
     def run_game(self):
         """"Main loop of the game."""
 
-        while self.current_episode <= self.episodes:
+        while True:
             if self.settings.manual:    
                 self.check_events(self.settings.manual)
                 self.update_screen()
@@ -50,6 +51,9 @@ class The_Blob:
             clock = pygame.time.Clock()
             clock.tick(self.settings.fps)
 
+        # while self.current_episode > self.episodes:
+        #     self.check_events(self.settings.manual)
+        #     self.display_q_table()
 
     def check_events(self,manual):
         """Respond to keypresses and mouse events."""
@@ -100,6 +104,9 @@ class The_Blob:
         self.display_score()
         self.map.draw_map()
         self.blob.draw_blob()
+        if self.current_episode > self.episodes:
+            self.display_q_table()
+            
 
 
 
@@ -152,18 +159,18 @@ class The_Blob:
     def goal_collision(self):
         #Implement when QL is done.
         self.blob.rect.topleft = [self.settings.block_size*i for i in self.spawn_tile]
-        self.score += 10
-        print("Goal Collision")
+        self.score += self.settings.rewards[2]
+        #print("Goal Collision")
 
     def lava_collision(self):
         self.blob.rect.topleft = [self.settings.block_size*i for i in self.spawn_tile]
-        self.score += -10
-        print("Lava Collision")
+        self.score += self.settings.rewards[3]
+        #print("Lava Collision")
 
     def water_collision(self):
         #Implement when QL is done.
-        self.score += -2
-        print("Water Collision")
+        self.score += self.settings.rewards[4]
+        #print("Water Collision")
 
 
     ### Q_learning
@@ -172,7 +179,7 @@ class The_Blob:
         """Returns highest rewarding action from q_table at position (x,y)."""
 
         # np.array of rewards for taking each action at current state (tile). 
-        # format is [right,left,up,down].
+        # format is [right,up,left,down], keep this for easier display score.
         current_actions = self.q_table[x,y,:]
 
         # Max value at current state
@@ -201,7 +208,8 @@ class The_Blob:
         """"Returns new state after performing action at position (x,y)."""
 
         #[right,left,down,up]
-        delta = [(1,0), (-1,0), (0,1), (0,-1)][action]
+        #[right,up,left,down], keep this format for easier display score.
+        delta = [(1,0), (0,-1), (-1,0), (0,1)][action]
 
         # Move current state with delta. If new state is outside map, return old state.
         # np.array ???
@@ -214,58 +222,84 @@ class The_Blob:
     
     def q_learning(self, start_state, epsilon, alpha, gamma):
 
-
         state = start_state
         cumulative_change  = 0
+        reward = 0
 
         while True:
+            
+            if self.current_episode <= self.episodes:
+                # Current position
+                x = state[0]
+                y = state[1]
+    
+                ### Calculate relevant information for updating Q-table and to move blob.
 
-            # Current position
-            x = state[0]
-            y = state[1]
- 
-            ### Calculate relevant information for updating Q-table and to move blob.
+                # Choose an action
+                action = self.epsilon_greedy_policy(x,y,epsilon)
+                # Get new state
+                new_state = self.transition(x,y,action)
+                # Reward at new state
+                reward_index = self.settings.map[new_state[0], new_state[1]]
+                reward = self.settings.rewards[reward_index]
+                
 
-            # Choose an action
-            action = self.epsilon_greedy_policy(x,y,epsilon)
-            # Get new state
-            new_state = self.transition(x,y,action)
-            # Reward at new state
-            reward_index = self.settings.map[new_state[0], new_state[1]]
-            reward = self.settings.rewards[reward_index]
+                ### Update Q-table
+
+                # Update cumulative sum of episode adjustments
+                cumulative_change += reward + gamma*np.max(self.q_table[new_state[0],new_state[1]]) -\
+                    self.q_table[x,y,action]
+
+                # Correction of current episode
+                change = alpha*(reward + gamma*np.max(self.q_table[new_state[0],new_state[1]]) - self.q_table[x,y,action])
+
+                # Update q_table (global variable), i.e,
+                # Q(S,A) := Q(S,A) + alpha*( R + gamma*max_aQ(S',a) - Q(S,A) ) 
+                self.q_table[x,y,action] += change
+                
+                # Update game
+                self.update_screen()
+                self.blob.move_blob(self.settings.manual, algorithm_movement = new_state)
+                self.detect_collision()
+
+                # Update state
+                state = new_state
+                # If we hit terminal state (lava or goal), end episode
+                if reward == -2 or reward == 10:
+                    #print("Reward: " + str(reward))
+                    return([reward, cumulative_change])
+
+            else:
+                self.check_events(self.settings.manual)
+                self.update_screen()
+                #print(self.q_table)
+
+
             
 
-            ### Update Q-table
+    def display_q_table(self):         
+        for y in range(self.settings.screen_height // self.settings.block_size):
+            for x in range(self.settings.screen_width // self.settings.block_size):
+                if self.settings.map[y,x] not in [2,3]:
+                    for action in [0,1,2,3]:
+                        xx = 15*np.cos(action*np.pi/2)
+                        yy = 15*np.sin(action*np.pi/2)
+                        #self.text_qvalue1 = self.font_q_table.render( \
+                            #str((x,y)), action, True, (255,255,255))
+                            
+                        self.text_qvalue = self.font_q_table.render( \
+                            str(round(self.q_table[x,y,0])), action, True, (255,255,255))
 
-            # Update cumulative sum of episode adjustments
-            cumulative_change += reward + gamma*np.max(self.q_table[new_state[0],new_state[1]]) +\
-                self.q_table[x,y,action]
+                        self.screen.blit(self.text_qvalue, self.text_qvalue.get_rect(center = \
+                            ((x+1/2)*self.settings.block_size + xx, (y+1/2)*self.settings.block_size - yy)))
 
-            # Correction of current episode
-            change = alpha*(reward + gamma*np.max(self.q_table[new_state[0],new_state[1]]) +\
-                self.q_table[x,y,action])
-
-            # Update q_table (global variable)
-            self.q_table[x,y,action] += change
-
-            ### Move blob
-            self.update_screen()
-            self.blob.move_blob(self.settings.manual, algorithm_movement = new_state)
-            self.detect_collision()
-
-            # Update state
-            state = new_state
-            # If we hit terminal state (lava or goal), end episode
-            if reward == -10 or reward == 10:
-                print("Reward: " + str(reward))
-                return([reward, cumulative_change])
-
-            
+                        # Displays position, for testing
+                        #self.screen.blit(self.text_qvalue1, self.text_qvalue1.get_rect(center = \
+                            #((x+1/2)*self.settings.block_size, (y+1/2)*self.settings.block_size)))
 
 
 
-
-
+#str(round(self.q_table[x,y,0]))
 
 
 
