@@ -3,7 +3,7 @@ import numpy as np
 
 class Map:
     """Class for different tiles on map"""
-    """Design of map is found in settings.py"""
+    """Design of playable maps is found in player_settings.py"""
 
     def __init__(self, blob_game):
         
@@ -30,8 +30,8 @@ class Map:
     def draw_map(self):
         """"Comment"""
         block_size = self.settings.block_size
-        for y in range(self.settings.screen_width// block_size):
-            for x in range(self.settings.screen_height // block_size):
+        for x in range(self.settings.screen_width// block_size):
+            for y in range(self.settings.screen_height // block_size):
                 self.rect = pygame.Rect(x*block_size, y*block_size, block_size, block_size)
                 type_of_tile = self.map[y,x]
 
@@ -44,13 +44,11 @@ class Map:
                 if type_of_tile == 4: # Blue (water)
                     pygame.draw.rect(self.screen, (0,0,255), self.rect)
 
-
-
     def create_map_rects(self, return_spawn_tile = False):
         """Create rects for non-zero tiles on maps. Also gives option to return spawn tile."""
         block_size = self.settings.block_size
-        for y in range(self.settings.screen_width // block_size):
-            for x in range(self.settings.screen_height // block_size):
+        for x in range(self.settings.screen_width // block_size):
+            for y in range(self.settings.screen_height // block_size):
                 type_of_tile = self.map[y,x]
 
                 if type_of_tile != 0:
@@ -58,7 +56,7 @@ class Map:
                     self.tiles.append([type_of_tile, tile])
 
                     if type_of_tile == 1:
-                        spawn_tile = [y,x]
+                        spawn_tile = [x,y]
 
         if return_spawn_tile:
             return(spawn_tile)
