@@ -1,6 +1,8 @@
 # Grid World for Reinforcement Learning
 
-Grid World is a simple game where you control an agent on a grid map. The goal is to take the agent from spawn to goal without touching the lava and to avoid the water as much as possible. Furthermore, Q-Learning, which is a machine learning algorithm of the type reinforcement learning, is implemented and it can be used to train the agent to find its own path on the grid. A simple text file map editor is included which allows the player to design their own challanges for the Q-Learning agent to beat.  
+Grid World is a simple game where you control an agent on a grid map. The goal is to take the agent from spawn to goal without touching the lava and to avoid the water as much as possible. Furthermore, Q-Learning, which is a machine learning algorithm of the type reinforcement learning, is implemented and it can be used to train the agent to find its own path on the grid. A simple text file map editor is included which allows the player to design their own challanges for the Q-Learning agent to beat.
+
+The game can be started by running the `grid_world.py` file. Required packages are `pygame` and `numpy`. 
 
 ![Map1](https://github.com/byKasperAndersson/Grid-World-for-Reinforcement-Learning/blob/main/images/map1.PNG?raw=true)
 ![Map3](https://github.com/byKasperAndersson/Grid-World-for-Reinforcement-Learning/blob/main/images/map3.PNG?raw=true)
