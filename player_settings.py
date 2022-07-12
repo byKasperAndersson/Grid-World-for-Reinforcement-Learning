@@ -27,21 +27,17 @@ map2 = np.array([[0,0,1,0,0,0,0,0],
                  [0,0,0,0,0,0,2,0],
                  [0,0,0,0,0,0,0,0]])
 
-#10x10 map with spawn, goal and some lava.
-map3 = np.array([[0,0,0,0,0,0,0,0,0,0],
-                 [0,1,0,0,0,0,0,0,0,0],
-                 [0,0,0,0,0,0,0,0,0,0],
+#6x10 map with spawn, goal and some lava.
+map3 = np.array([[0,1,0,0,0,0,0,0,0,0],
                  [0,0,0,0,3,0,0,0,0,0],
                  [0,0,0,0,3,0,0,0,0,0],
                  [0,0,0,0,3,0,0,0,0,0],
                  [0,0,0,0,3,0,0,0,0,0],
-                 [0,0,0,0,0,0,0,0,0,0],
-                 [0,0,0,0,0,0,0,0,2,0],
-                 [0,0,0,0,0,0,0,0,0,0]])
+                 [0,0,0,0,0,0,0,0,2,0]])
 
 
 #10x10 map with spawn,goal and more lava.
-map3 = np.array([[0,0,0,0,0,3,0,0,0,0,0],
+map4 = np.array([[0,0,0,0,0,3,0,0,0,0,0],
                  [0,1,0,0,0,3,0,0,0,0,0],
                  [0,0,0,0,0,0,0,0,0,0,0],
                  [0,0,0,0,0,3,0,0,0,0,0],
@@ -54,7 +50,7 @@ map3 = np.array([[0,0,0,0,0,3,0,0,0,0,0],
                  [0,0,0,0,0,3,0,0,0,0,0]])
 
 #8x18 map with spawn, goal, lava and water. (hard)
-map4 = np.array([[0,0,0,0,0,0,3,0,0,0,3,0,0,0,0,0,3,4],
+map5 = np.array([[0,0,0,0,0,0,3,0,0,0,3,0,0,0,0,0,3,4],
                  [0,0,3,3,3,0,3,0,3,0,3,0,3,0,3,0,3,4],
                  [0,0,3,0,3,0,3,0,3,0,3,0,3,0,3,0,3,4],
                  [0,0,3,0,3,0,3,0,3,0,3,0,3,0,3,0,3,4],
@@ -65,10 +61,10 @@ map4 = np.array([[0,0,0,0,0,0,3,0,0,0,3,0,0,0,0,0,3,4],
 
 
 # Map to be loaded into Grid World.
-map_to_play = map4
+map_to_play = map3
 
 # Episodes to be played before game over. Relevant variable in reinforcement learning.
-episodes = 50 
+episodes = 300 
 
 # Settings for Q-Learning. Can be ignored if playing manually.
 epsilon = 0.2

@@ -11,9 +11,9 @@ class Settings:
         # Play yourself or start with Q_Learning.
         self.manual = ps.manual
 
-        # Playable blob settings
+        # Playable agent settings
         self.block_size = 80
-        self.blob_color = (225,225,0)
+        self.agent_color = (225,225,0)
         self.fps = 30
         
         # Screen settings
@@ -24,7 +24,7 @@ class Settings:
         self.bg_color = (0,0,0)
 
         # Tile rewards. Format: [Standard, Spawn, Goal, Lava, Water]
-        self.rewards = [0,0,1,-1,-0.2]
+        self.rewards = [0,0,10,-10,-1]
 
         # Game settings, map loaded etc. Most loaded from player_settings.py
         self.map = ps.map_to_play

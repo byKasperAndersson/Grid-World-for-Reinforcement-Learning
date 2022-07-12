@@ -1,14 +1,14 @@
 import pygame
-import numpy as np
+
 
 class Map:
     """Class for different tiles on map"""
     """Design of playable maps is found in player_settings.py"""
 
-    def __init__(self, blob_game):
+    def __init__(self, grid_game):
         
-        self.screen = blob_game.screen
-        self.settings = blob_game.settings
+        self.screen = grid_game.screen
+        self.settings = grid_game.settings
         self.map = self.settings.map
         self.tiles = []
 

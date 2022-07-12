@@ -1,29 +1,29 @@
 import pygame
 
 
-class Blob:
+class Agent:
     """Playable character of the game and it's movements."""
 
-    def __init__(self, blob_game):
+    def __init__(self, grid_world):
 
         # Load screen and settings of game
-        self.screen = blob_game.screen
-        self.settings = blob_game.settings
-        self.score = blob_game.score
-        self.color = self.settings.blob_color
-        self.map = blob_game.map
-        self.spawn_tile = blob_game.spawn_tile
-        self.blob_game = blob_game
+        self.screen = grid_world.screen
+        self.settings = grid_world.settings
+        self.score = grid_world.score
+        self.color = self.settings.agent_color
+        self.map = grid_world.map
+        self.spawn_tile = grid_world.spawn_tile
+        self.grid_world = grid_world
 
 
-        # Load image of blob charatcer
-        # self.image = pygame.image.load("images\\blob.bmp")
+        # Load image of agent charatcer
+        # self.image = pygame.image.load("images\\agent.bmp")
         # self.rect = self.image.get_rect()
         
         self.rect = pygame.Rect(0, 0, self.settings.block_size, self.settings.block_size)
 
 
-        # Start each new blob at position spawn tile from settings.
+        # Start each new agent at position spawn tile from settings.
         for y in range(self.settings.screen_height // self.settings.block_size):
             for x in range(self.settings.screen_height // self.settings.block_size):
                 if self.settings.map[y,x] == 1:
@@ -36,33 +36,33 @@ class Blob:
         self.move_up    = False
         self.move_down  = False
 
-    def move_blob(self, manual, algorithm_movement = None):
-        """Moves the blob according to either keyboard arrows (manual = True) or 
+    def move_agent(self, manual, algorithm_movement = None):
+        """Moves the agent according to either keyboard arrows (manual = True) or 
             from Q-Learning algorithm (manual = False).
             If manual = False, then algorithm_movement should be the new position
-            of the blob (= [x_new,y_new])."""
+            of the agent (= [x_new,y_new])."""
 
         if manual:
             if self.move_right and (self.rect.right < self.settings.screen_width):
                 self.rect.x += self.settings.block_size
-                self.detect_collision(game = self.blob_game)
+                self.detect_collision(game = self.grid_world)
             if self.move_left and (self.rect.left > 0):
                 self.rect.x -= self.settings.block_size
-                self.detect_collision(game = self.blob_game)
+                self.detect_collision(game = self.grid_world)
             if self.move_up and (self.rect.top > 0):
                 self.rect.y -= self.settings.block_size
-                self.detect_collision(game = self.blob_game)
+                self.detect_collision(game = self.grid_world)
             if self.move_down and (self.rect.bottom < self.settings.screen_height):
                 self.rect.y += self.settings.block_size
-                self.detect_collision(game = self.blob_game)
+                self.detect_collision(game = self.grid_world)
         else:
             self.rect.x = algorithm_movement[0]*self.settings.block_size
             self.rect.y = algorithm_movement[1]*self.settings.block_size
-            self.detect_collision(game = self.blob_game)
+            self.detect_collision(game = self.grid_world)
 
 
-    def draw_blob(self):
-        """Function to draw the blob character on screen"""
+    def draw_agent(self):
+        """Function to draw the agent character on screen"""
         pygame.draw.rect(self.screen, self.color, self.rect)
 
 
@@ -100,7 +100,7 @@ class Blob:
 
     def water_collision(self, game):
         #Implement when QL is done.
-        game.score = round(game.score + self.settings.rewards[4],3)
+        game.score = round(game.score + (self.settings.rewards[4])/2,3)
         #print("Water Collision")
 
 

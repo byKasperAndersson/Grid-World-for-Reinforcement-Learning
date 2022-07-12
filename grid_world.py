@@ -1,11 +1,11 @@
 import pygame 
 import sys
 from settings import Settings
-from blob import Blob
+from agent import Agent
 from map import Map
 import numpy as np
 
-class The_Blob:
+class Grid_World:
 
     def __init__(self):
         """Initialize the game and ."""
@@ -28,7 +28,7 @@ class The_Blob:
         # Game fonts
         self.screen = pygame.display.set_mode((self.settings.total_width,
             self.settings.screen_height))
-        pygame.display.set_caption("The Blob")
+        pygame.display.set_caption("Grid World")
         self.font_score = pygame.font.SysFont(None, 25)
         self.font_q_table = pygame.font.SysFont(None,15)
 
@@ -36,7 +36,7 @@ class The_Blob:
         self.map = Map(self)
         # Create map, returns spawn_tile. Needed for some functions.
         self.spawn_tile = self.map.create_map_rects(return_spawn_tile=True)
-        self.blob = Blob(self)
+        self.agent= Agent(self)
 
         # Create map, returns spawn_tile. Needed for some functions.
         self.spawn_tile = self.map.create_map_rects(return_spawn_tile=True)
@@ -48,7 +48,7 @@ class The_Blob:
             if self.settings.manual:    
                 self.check_events(self.settings.manual)
                 self.update_screen()
-                self.blob.move_blob(self.settings.manual)
+                self.agent.move_agent(self.settings.manual)
                 #self.detect_collision()
             else:
                 self.q_learning(self.spawn_tile, self.epsilon, self.alpha, self.gamma)
@@ -64,40 +64,37 @@ class The_Blob:
     def check_events(self,manual):
         """Respond to keypresses and mouse events."""
         for event in pygame.event.get():
+            print(self.score)
             if event.type == pygame.QUIT:
                 sys.exit()
             
             if manual: 
                 if event.type == pygame.KEYDOWN:
 
-                    #print([self.blob.rect.x // self.settings.block_size, 
-                        #self.blob.rect.y // self.settings.block_size])
-                    # print([self.settings.map[self.blob.rect.y // self.settings.block_size, self.blob.rect.x // self.settings.block_size]])
-
                     # To prevent diagonal movement
-                    self.blob.move_right = False
-                    self.blob.move_left = False
-                    self.blob.move_up = False
-                    self.blob.move_down = False
+                    self.agent.move_right = False
+                    self.agent.move_left = False
+                    self.agent.move_up = False
+                    self.agent.move_down = False
 
                     if event.key == pygame.K_RIGHT:
-                        self.blob.move_right = True
+                        self.agent.move_right = True
                     if event.key == pygame.K_LEFT:
-                        self.blob.move_left = True
+                        self.agent.move_left = True
                     if event.key == pygame.K_UP:
-                        self.blob.move_up = True
+                        self.agent.move_up = True
                     if event.key == pygame.K_DOWN:
-                        self.blob.move_down = True
+                        self.agent.move_down = True
                         
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_RIGHT: 
-                        self.blob.move_right = False
+                        self.agent.move_right = False
                     if event.key == pygame.K_LEFT:
-                        self.blob.move_left = False
+                        self.agent.move_left = False
                     if event.key == pygame.K_UP:
-                        self.blob.move_up = False
+                        self.agent.move_up = False
                     if event.key == pygame.K_DOWN:
-                        self.blob.move_down = False
+                        self.agent.move_down = False
                 
 
 
@@ -109,7 +106,7 @@ class The_Blob:
         self.draw_grid()
         self.display_score()
         self.map.draw_map()
-        self.blob.draw_blob()
+        self.agent.draw_agent()
         if self.current_episode > self.episodes:
             self.display_q_table()
             
@@ -137,45 +134,6 @@ class The_Blob:
                 rect = pygame.Rect(x*block_size, y*block_size, block_size, block_size)
                 # Draw the rectangle on screen, with color 200^3, and with bordersize of 1
                 pygame.draw.rect(self.screen, (200,200,200), rect, 1)
-
-
-    # def detect_collision(self):
-    #     """Detects collisions and calls proper collision function."""
-    #     block_size = self.settings.block_size
-
-    #     for tile in self.map.tiles:
-    #         if [self.blob.rect.x // block_size, self.blob.rect.y // block_size] == [tile[1].x, tile[1].y]:
-                
-    #             # Green (goal) collision, send back to spawn, positive points.
-    #             if tile[0] == 2:
-    #                 self.goal_collision()
-    #                 self.current_episode += 1
-
-    #             # Red (lava) collision, send back to spawn, negative points.
-    #             if tile[0] == 3:
-    #                 self.lava_collision()
-    #                 self.current_episode += 1
-
-    #             # Blue (water) collision, negative points.
-    #             if tile[0] == 4:
-    #                 self.water_collision()
-
-
-    # def goal_collision(self):
-    #     #Implement when QL is done.
-    #     self.blob.rect.topleft = [self.settings.block_size*i for i in self.spawn_tile]
-    #     self.score += self.settings.rewards[2]
-    #     #print("Goal Collision")
-
-    # def lava_collision(self):
-    #     self.blob.rect.topleft = [self.settings.block_size*i for i in self.spawn_tile]
-    #     self.score += self.settings.rewards[3]
-    #     #print("Lava Collision")
-
-    # def water_collision(self):
-    #     #Implement when QL is done.
-    #     self.score += self.settings.rewards[4]
-    #     #print("Water Collision")
 
 
     ### Q_learning
@@ -244,7 +202,7 @@ class The_Blob:
                 x = state[0]
                 y = state[1]
     
-                ### Calculate relevant information for updating Q-table and to move blob.
+                ### Calculate relevant information for updating Q-table and to move agent.
 
                 # Choose an action
                 action = self.epsilon_greedy_policy(x,y,epsilon)
@@ -270,13 +228,13 @@ class The_Blob:
                 
                 # Update game
                 self.update_screen()
-                self.blob.move_blob(self.settings.manual, algorithm_movement = new_state)
+                self.agent.move_agent(self.settings.manual, algorithm_movement = new_state)
                 #self.detect_collision()
 
                 # Update state
                 state = new_state
                 # If we hit terminal state (lava or goal), end episode
-                if reward == -1 or reward == 1:
+                if reward == -10 or reward == 10:
                     #print("Reward: " + str(reward))
                     return([reward, cumulative_change])
 
@@ -316,5 +274,5 @@ class The_Blob:
 
 if __name__ == "__main__":
     # Make instance of game and run game.
-    blob_game = The_Blob()
-    blob_game.run_game()
+    grid_world = Grid_World()
+    grid_world.run_game()
