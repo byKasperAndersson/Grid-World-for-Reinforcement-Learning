@@ -32,6 +32,6 @@ To be written.
 
 ## To-Do List
 - Show which Q-Learning variables are used during play
-- Implement other reinforcement learning algorithms, such as Deep Reinforcement Learning.
+- Implement other reinforcement learning algorithms.
 - Implement decaying rates for the Q-Learning. 
 
